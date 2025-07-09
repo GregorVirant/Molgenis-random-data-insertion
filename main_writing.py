@@ -15,8 +15,8 @@ headers = {
     "x-molgenis-token": token
 }
 
-BATCH_SIZE = 1000
-NUMBER_OF_BATCHES = 5
+BATCH_SIZE = 100
+NUMBER_OF_BATCHES = 1
 
 names_list = [] #data insterted later
 surname_list = []
@@ -24,6 +24,10 @@ current_id = 0
 
     
 def main():
+    global current_id
+    #TODO seperate number of batches
+    #TODO imena ticketov
+    
     table = "Client_table"
     table_params_string = [
         ("id", lambda : str(current_id)),
@@ -36,8 +40,37 @@ def main():
         ("country", lambda: """{name: "Slovenija"}""")
     ]
 
+    for i in range(NUMBER_OF_BATCHES):
+        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    current_id=0
 
-    global current_id
+
+    table = "Ticket_kind"
+    table_params_string = [
+        ("id", lambda : str(current_id)),
+        ("name", lambda : names_list[randint(0, len(names_list) - 1)]),
+    ]
+    table_params_non_string = [
+        ("price", lambda : str(randint(1,100))),
+        ("valid_for_h", lambda : str(randint(12,10000)))
+    ]
+
+    for i in range(NUMBER_OF_BATCHES):
+        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    current_id=0
+
+
+    table = "Client_ticket"
+    table_params_string = [
+        ("id", lambda : str(current_id)),
+        ("activation_time",lambda: "2025-07-01T12:00:00")
+    ]
+    table_params_non_string = [
+        ("price", lambda : str(randint(1,100))),
+        ("client", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" ),
+        ("ticket", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }")
+    ]
+
     for i in range(NUMBER_OF_BATCHES):
         send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
     current_id=0
@@ -55,24 +88,24 @@ def get_query_for_table(table_name, table_params_string, table_params_non_string
     for j in range(BATCH_SIZE):
         current_id+=1
 
-        query+="{"
+        query_fields = []
+        
         for index, param in enumerate(table_params_string):
-            query += param[0] + ": \"" + param[1]() + "\""
-            if (index != len(table_params_string) -1 or len(table_params_non_string) == 0):
-                query+=","
+            query_fields.append(param[0] + ": \"" + param[1]() + "\"")
 
         for index, param in enumerate(table_params_non_string):
-            query += param[0] + ": " + param[1]()
-            if (index != len(table_params_non_string) -1):
-                query+=","
+            query_fields.append(param[0] + ": " + param[1]())
 
+        query+="{"
+        query+=", ".join(query_fields)
         query+="}"
+
         if (j != BATCH_SIZE-1):
             query+=","
     
     query += "] ) { message status } }"
     
-    #print(query)
+    print(query)
     return query    
 if __name__ == "__main__":
     with open('name_list.txt', 'r') as file:
