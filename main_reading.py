@@ -13,6 +13,7 @@ def main():
         "Content-Type": "application/json",
         "x-molgenis-token": token
     }
+    #querying everything connected to a client
     query = """
     {
         Ticket_kind { 

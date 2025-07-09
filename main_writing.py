@@ -36,7 +36,8 @@ def main():
         ("country", lambda: """{name: "Slovenija"}""")
     ]
 
-    send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    for i in range(NUMBER_OF_BATCHES):
+        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
 
 def send_http_request(query):
     body = {
@@ -47,30 +48,29 @@ def send_http_request(query):
     print(response.text)
 def get_query_for_table(table_name, table_params_string, table_params_non_string):
     global current_id
-    for i in range(NUMBER_OF_BATCHES):
-        query = "mutation { save ( " +  table_name + ": ["
-        for j in range(BATCH_SIZE):
-            current_id+=1
+    query = "mutation { save ( " +  table_name + ": ["
+    for j in range(BATCH_SIZE):
+        current_id+=1
 
-            query+="{"
-            for index, param in enumerate(table_params_string):
-                query += param[0] + ": \"" + param[1]() + "\""
-                if (index != len(table_params_string) -1 or len(table_params_non_string) == 0):
-                    query+=","
-
-            for index, param in enumerate(table_params_non_string):
-                query += param[0] + ": " + param[1]()
-                if (index != len(table_params_non_string) -1):
-                    query+=","
-
-            query+="}"
-            if (j != BATCH_SIZE-1):
+        query+="{"
+        for index, param in enumerate(table_params_string):
+            query += param[0] + ": \"" + param[1]() + "\""
+            if (index != len(table_params_string) -1 or len(table_params_non_string) == 0):
                 query+=","
-        
-        query += "] ) { message status } }"
-        
-        #print(query)
-        return query    
+
+        for index, param in enumerate(table_params_non_string):
+            query += param[0] + ": " + param[1]()
+            if (index != len(table_params_non_string) -1):
+                query+=","
+
+        query+="}"
+        if (j != BATCH_SIZE-1):
+            query+=","
+    
+    query += "] ) { message status } }"
+    
+    #print(query)
+    return query    
 if __name__ == "__main__":
     with open('name_list.txt', 'r') as file:
         for line in file:
