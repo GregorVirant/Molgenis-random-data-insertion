@@ -36,8 +36,11 @@ def main():
         ("country", lambda: """{name: "Slovenija"}""")
     ]
 
+
+    global current_id
     for i in range(NUMBER_OF_BATCHES):
         send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    current_id=0
 
 def send_http_request(query):
     body = {
