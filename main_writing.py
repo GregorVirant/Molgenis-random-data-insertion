@@ -15,8 +15,8 @@ headers = {
     "x-molgenis-token": token
 }
 
-BATCH_SIZE = 100
-NUMBER_OF_BATCHES = 1
+BATCH_SIZE = 1000
+NUMBER_OF_BATCHES = 5
 
 names_list = [] #data insterted later
 surname_list = []
@@ -26,7 +26,6 @@ current_id = 0
 def main():
     global current_id
     #TODO seperate number of batches
-    #TODO imena ticketov
     
     table = "Client_table"
     table_params_string = [
@@ -48,7 +47,7 @@ def main():
     table = "Ticket_kind"
     table_params_string = [
         ("id", lambda : str(current_id)),
-        ("name", lambda : names_list[randint(0, len(names_list) - 1)]),
+        ("name", lambda : "Ticket"+str(current_id)),
     ]
     table_params_non_string = [
         ("price", lambda : str(randint(1,100))),
@@ -74,6 +73,31 @@ def main():
     for i in range(NUMBER_OF_BATCHES):
         send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
     current_id=0
+
+    table = "Test"
+    table_params_string = [
+        ("id", lambda : str(current_id))
+    ]
+    table_params_non_string = [
+        ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" )
+    ]
+
+    for i in range(NUMBER_OF_BATCHES):
+        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    current_id=0
+
+    table = "Test2"
+    table_params_string = [
+        ("id", lambda : str(current_id))
+    ]
+    table_params_non_string = [
+        ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" )
+    ]
+
+    for i in range(NUMBER_OF_BATCHES):
+        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+    current_id=0
+
 
 def send_http_request(query):
     body = {
@@ -105,7 +129,7 @@ def get_query_for_table(table_name, table_params_string, table_params_non_string
     
     query += "] ) { message status } }"
     
-    print(query)
+    #print(query)
     return query    
 if __name__ == "__main__":
     with open('name_list.txt', 'r') as file:
