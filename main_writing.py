@@ -16,7 +16,6 @@ headers = {
 }
 
 BATCH_SIZE = 1000
-NUMBER_OF_BATCHES = 5
 
 names_list = [] #data insterted later
 surname_list = []
@@ -25,13 +24,19 @@ current_id = 0
     
 def main():
     global current_id
-    #TODO seperate number of batches
+    NUMBER_OF_BATCHES_CLIENT = 0
+    NUMBER_OF_BATCHES_TICKET = 10
+    NUMBER_OF_BATCHES_CLIENT_TICKET = 0
+    NUMBER_OF_BATCHES_TEST = 10
+    NUMBER_OF_BATCHES_TEST_2 = 10
+    NUMBER_OF_BATCHES_TEST_3 = 50
+    NUMBER_OF_BATCHES_TEST_4 = 50
     
     table = "Client_table"
     table_params_string = [
         ("id", lambda : str(current_id)),
         ("name", lambda : names_list[randint(0, len(names_list) - 1)]),
-        ("surname", lambda : surname_list[randint(0, len(names_list) - 1)]),
+        ("surname", lambda : surname_list[randint(0, len(surname_list) - 1)]),
         ("created_on",lambda: "2025-07-01T12:00:00"),
         ("date_of_birth", lambda: str(randint(1950,2024))+"-05-03")
         ]
@@ -39,7 +44,7 @@ def main():
         ("country", lambda: """{name: "Slovenija"}""")
     ]
 
-    for i in range(NUMBER_OF_BATCHES):
+    for i in range(NUMBER_OF_BATCHES_CLIENT):
         send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
     current_id=0
 
@@ -54,49 +59,82 @@ def main():
         ("valid_for_h", lambda : str(randint(12,10000)))
     ]
 
-    for i in range(NUMBER_OF_BATCHES):
+    for i in range(NUMBER_OF_BATCHES_TICKET):
         send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
     current_id=0
 
+    if BATCH_SIZE*NUMBER_OF_BATCHES_CLIENT-1 > 1 and BATCH_SIZE*NUMBER_OF_BATCHES_TICKET-1 > 1:
+        print("\nClient ticket:")
+        table = "Client_ticket"
+        table_params_string = [
+            ("id", lambda : str(current_id)),
+            ("activation_time",lambda: "2025-07-01T12:00:00")
+        ]
+        table_params_non_string = [
+            ("price", lambda : str(randint(1,100))),
+            ("client", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_CLIENT-1)) + "\" }" ),
+            ("ticket", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_TICKET-1)) + "\" }")
+        ]
 
-    table = "Client_ticket"
-    table_params_string = [
-        ("id", lambda : str(current_id)),
-        ("activation_time",lambda: "2025-07-01T12:00:00")
-    ]
-    table_params_non_string = [
-        ("price", lambda : str(randint(1,100))),
-        ("client", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" ),
-        ("ticket", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }")
-    ]
+        for i in range(NUMBER_OF_BATCHES_CLIENT_TICKET):
+            send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+        current_id=0
 
-    for i in range(NUMBER_OF_BATCHES):
-        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
-    current_id=0
+    if BATCH_SIZE*NUMBER_OF_BATCHES_TICKET-1 > 1:
+        print("\nTest:")
+        table = "Test"
+        table_params_string = [
+            ("id", lambda : str(current_id))
+        ]
+        table_params_non_string = [
+            ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_TICKET-1)) + "\" }" )
+        ]
 
-    table = "Test"
-    table_params_string = [
-        ("id", lambda : str(current_id))
-    ]
-    table_params_non_string = [
-        ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" )
-    ]
+        for i in range(NUMBER_OF_BATCHES_TEST):
+            send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+        current_id=0
 
-    for i in range(NUMBER_OF_BATCHES):
-        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
-    current_id=0
+    if BATCH_SIZE*NUMBER_OF_BATCHES_TEST-1 > 1:
+        print("\nTest2:")
+        table = "Test2"
+        table_params_string = [
+            ("id", lambda : str(current_id))
+        ]
+        table_params_non_string = [
+            ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_TEST-1)) + "\" }" )
+        ]
 
-    table = "Test2"
-    table_params_string = [
-        ("id", lambda : str(current_id))
-    ]
-    table_params_non_string = [
-        ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES-1)) + "\" }" )
-    ]
+        for i in range(NUMBER_OF_BATCHES_TEST_2):
+            send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+        current_id=0
 
-    for i in range(NUMBER_OF_BATCHES):
-        send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
-    current_id=0
+    if BATCH_SIZE*NUMBER_OF_BATCHES_TEST_2-1 > 1:
+        print("\nTest3:")
+        table = "Test3"
+        table_params_string = [
+            ("id", lambda : str(current_id))
+        ]
+        table_params_non_string = [
+            ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_TEST_2-1)) + "\" }" )
+        ]
+
+        for i in range(NUMBER_OF_BATCHES_TEST_3):
+            send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+        current_id=0
+
+    if BATCH_SIZE*NUMBER_OF_BATCHES_TEST_3-1 > 1:
+        print("\nTest4:")
+        table = "Test4"
+        table_params_string = [
+            ("id", lambda : str(current_id))
+        ]
+        table_params_non_string = [
+            ("test", lambda : "{id: \"" + str(randint(1,BATCH_SIZE*NUMBER_OF_BATCHES_TEST_3-1)) + "\" }" )
+        ]
+
+        for i in range(NUMBER_OF_BATCHES_TEST_4):
+            send_http_request(get_query_for_table(table, table_params_string, table_params_non_string))   
+        current_id=0
 
 
 def send_http_request(query):
